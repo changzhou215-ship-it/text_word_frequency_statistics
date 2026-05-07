@@ -1,6 +1,6 @@
 {
     "code-runner.executorMap": {
-        "cpp": "cd /d \"$dir\" && D:\\Dev-Cpp\\MinGW64\\bin\\g++.exe -std=c++14 -o \"$fileNameWithoutExt.exe\" \"$fileName\" && start cmd /k \"\"$fileNameWithoutExt.exe\" & pause\""
+        "c": "cd /d \"$dir\" && D:\\Dev-Cpp\\MinGW64\\bin\\gcc.exe -std=c11 -o \"$fileNameWithoutExt.exe\" main.c hash_table.c && start cmd /k \"\"$fileNameWithoutExt.exe\" & pause\""
     },
     "code-runner.runInTerminal": true,
     "code-runner.saveFileBeforeRun": true,
