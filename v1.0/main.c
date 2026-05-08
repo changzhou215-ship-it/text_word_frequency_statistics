@@ -1,27 +1,26 @@
-#include <stdio.h>   /* printf, fprintf, fgets, fopen, fclose, fscanf, stderr, stdin */
-#include <stdlib.h>  /* qsort, free */
-#include <string.h>  /* strcpy, strcspn */
-#include <ctype.h>   /* tolower */
-#include "hash_table.h"
+#include <stdio.h>   // fprintf, fgets, fopen, fclose, fscanf, stderr标准错误输出流, stdin标准输入
+#include <stdlib.h>  // qsort(快速排序算法), free(释放动态分配的内存)
+#include <string.h>  // strcpy(字符串复制), strcspn(查找字符串中首个匹配字符集的字符位置，常用于去除换行符) 
+#include <ctype.h>   // 引入字符类型库。提供：tolower(将大写字母转换为小写字母)
+#include "hash_table.h" // 自定义哈希表头文件，包含 HashTable 结构体定义和相关函数声明
 
-#define MAX_WORD_LEN 256   /* 单个单词最大读取长度 */
-#define MAX_PATH_LEN 512   /* 文件路径最大长度 */
+#define MAX_WORD_LEN 256   // 单个单词最大读取长度为256个字符（包含末尾的'\0'结束符）
+#define MAX_PATH_LEN 512   // 文件路径最大长度为512个字符
 
-/* ---------------------------------------------------------------
- * str_tolower — 将字符串原地转为全小写
- * tolower 需要先转为 unsigned char，避免负数传入导致未定义行为
- * ---------------------------------------------------------------*/
-static void str_tolower(char *str) {
-    for (int i = 0; str[i]; i++)
-        str[i] = (char)tolower((unsigned char)str[i]);
+
+// static (静态)：这是一个特殊标签。它意味着这个函数只能在当前这个 .c 文件里使用
+static void str_tolower(char *str) { // str_tolower 将字符串原地转为全小写
+    for (int i = 0; str[i]; i++) // 当前字符不为 '\0' 时继续循环
+        str[i] = (char)tolower((unsigned char)str[i]); // 需要先转为 unsigned char，避免负数传入导致未定义行为
+        // tolower 函数规定，传入参数必须是能用 unsigned char（无符号字符型）表示的正数，或者是 EOF（-1）
 }
 
-/* ================================================================
- * main — 程序入口
+/*
+ * main 程序入口
  * 两种运行方式：
- *   1. 命令行：wordTally.exe sample.txt
- *   2. 交互式：直接双击或点三角形按钮，弹出窗口后输入文件路径
- * ================================================================ */
+ *  1. 命令行：`main.exe sample.txt`
+ *  2. 交互式：直接双击或点三角形按钮，弹出窗口后输入文件路径
+ */
 int main(int argc, char *argv[]) {
 
     /* ----- 1. 获取文件路径 -----
@@ -34,7 +33,7 @@ int main(int argc, char *argv[]) {
         strcpy(file_path, argv[1]);          /* 命令行提供了路径 */
     } else {
         printf("Enter file path: ");         /* 提示用户输入 */
-        fgets(file_path, sizeof(file_path), stdin);
+        fgets(file_path, sizeof(file_path), stdin);  // stdin 读取输入一行，包含换行符
         file_path[strcspn(file_path, "\r\n")] = '\0';  /* 截掉换行符 */
     }
 
