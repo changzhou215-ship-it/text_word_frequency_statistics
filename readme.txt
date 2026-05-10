@@ -1,31 +1,33 @@
-1.0版功能说明：
-- 读取本地文本文件
-- 按空白字符（空格、换行、制表符）简单分词
-- 统计每个单词出现次数，输出Top 5高频词及出现次数
-- 输出文章总单词数
-- 命令行用法：wordTally <file_path>
-- 代码结构：单文件main.cpp，所有逻辑内联
+v1.0 基础原型
+──────────────────────────────
+【功能】
+- 读取本地文本文件（.txt）
+- 按空白字符（空格、换行、制表符）分词
+- 大小写不敏感统计（统一转小写）
+- 输出全部单词按频率降序排列 + 总单词数
+- 支持命令行参数和交互式输入两种运行方式
 
-1.1版更新说明：
-- 拆分模块：main.cpp + word_analyzer.h + word_analyzer.cpp
-- 分词优化：去除标点符号，分词更准确
-- 新增排除词过滤功能（-e word1 word2 ...）
-- 新增词长过滤功能（--min-length / --max-length）
-- 新增自定义Top N数量（-t N，默认5）
-- 新增百分比显示开关（-p）
-- 新增结果输出到文件（-o output.txt）
-- 所有单词统一转小写，不区分大小写
-- 增加基础错误处理（文件不存在等）
-- 命令行用法：wordTally -l <file> [-e words...] [-t N] [--min-length N] [--max-length N] [-p] [-o <output>]
+【用法】
+  命令行模式： main.exe <文件路径>
+  交互式模式： 直接运行 main.exe，按提示输入文件路径
+  示例：       main.exe sample.txt
 
-2.0版完整功能说明：
-- 拆分模块：main.cpp + cli_parser.h/.cpp + word_analyzer.h/.cpp + CMakeLists.txt
-- 新增总字符数统计（含空格/不含空格）
-- 新增词汇多样性指标（不重复词数 / 总词数）
-- 新增词长分布直方图（文本形式输出各长度区间的单词数量）
-- 新增两级排序模式（--sort alpha）：先按首字母A->Z，同字母内按单词长度由短到长；默认按频率降序（--sort freq）
-- 新增排除词文件支持（-x stopwords.txt），从文件加载排除词列表
-- 新增大小写敏感开关（-c）：开启后区分大小写，大写字母排序优先于小写
-- 完善错误处理：空文件、文件编码异常、大文件等情况
-- 使用CMake构建系统
-- 命令行用法：wordTally -l <file> [-e words...] [-x <stopwords>] [-t N] [--min-length N] [--max-length N] [-p] [-c] [--sort freq|alpha] [-o <output>]
+【代码结构】
+  语言：C（C11 标准）
+  文件：main.c + hash_table.h + hash_table.c
+  编译：gcc -std=c11 -o main.exe main.c hash_table.c
+  - hash_table.h   — 哈希表数据结构声明（15行注释头）
+  - hash_table.c   — 手写哈希表实现（djb2 + 链地址法，125行）
+  - main.c         — 主流程：输入→统计→排序→输出（101行）
+
+【扩展点】
+- Top N 数量：修改 main.c 中 top_n 变量即可限制输出条数
+- 哈希表参数：修改 HASH_SIZE 宏可调整桶数量
+- 大小写行为：注释 str_tolower() 调用即可恢复大小写敏感
+- 分词精度：fscanf("%s") 目前不处理标点，可在读取后增加标点清洗
+
+【已知局限】
+- 不处理标点符号（"world!" 和 "world" 被视为两个不同词）
+- 无命令行选项（-e, -t 等，将在 v1.1 实现）
+- 单字节编码，不支持 UTF-8 中文分词
+- 仅输出到屏幕，不支持输出到文件
