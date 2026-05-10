@@ -63,7 +63,7 @@ void ht_insert(HashTable *ht, const char *word) {
 
     /* 新单词：分配节点 + 复制字符串 */
     WordEntry *new_entry = (WordEntry *)malloc(sizeof(WordEntry));
-    size_t len = strlen(word);
+    size_t len = strlen(word);  // size_t 是无符号整数类型，适合存储字符串长度，strlen 返回字符串的长度（不包括 '\0' 结束符）
     new_entry->word = (char *)malloc(len + 1);  /* +1 给 '\0' */
     strcpy(new_entry->word, word);
     new_entry->count = 1;
@@ -75,17 +75,16 @@ void ht_insert(HashTable *ht, const char *word) {
     ht->unique_count++;
 }
 
-/*
- * ht_to_array — 将哈希表导出为 WordPair 数组
+/* ht_to_array — 将哈希表导出为 WordPair 数组
  * 遍历所有桶的所有节点，收集到连续数组中供 qsort 排序
  * 注意：word 字段指向哈希表内部字符串（不复制），
- *       数组使用期间不要释放哈希表
+ *      数组使用期间不要释放哈希表
  */
 WordPair *ht_to_array(HashTable *ht, int *out_count) {
     *out_count = ht->unique_count;
-    WordPair *arr = (WordPair *)malloc(ht->unique_count * sizeof(WordPair));
+    WordPair *arr = (WordPair *)malloc(ht->unique_count * sizeof(WordPair));  // 计算需要的内存大小，分配一个 WordPair 数组
     int idx = 0;
-    for (int i = 0; i < HASH_SIZE; i++) {
+    for (int i = 0; i < HASH_SIZE; i++) {  // // 遍历 10007 个桶
         WordEntry *entry = ht->buckets[i];
         while (entry) {
             arr[idx].word = entry->word;      /* 只存指针，不复制 */
@@ -94,33 +93,32 @@ WordPair *ht_to_array(HashTable *ht, int *out_count) {
             entry = entry->next;
         }
     }
-    return arr;
+    return arr;  // 返回地址
 }
 
-/*
- * cmp_by_freq — qsort 比较函数
+/* cmp_by_freq — qsort 比较函数
  * 按出现次数降序：b.count - a.count（返回值 > 0 则 b 排前面）
  */
-int cmp_by_freq(const void *a, const void *b) {
+int cmp_by_freq(const void *a, const void *b) {  // qsort 的比较函数必须接受 const void * 类型的参数，表示两个待比较的元素
     const WordPair *pa = (const WordPair *)a;
     const WordPair *pb = (const WordPair *)b;
-    return pb->count - pa->count;
+    return pb->count - pa->count;  // 返回正数表示 pb 出现次数多，应该排在前面；返回负数表示 pa 出现次数多，应该排在前面；返回0表示两者出现次数相同，顺序不变
 }
 
-/*
- * ht_destroy — 销毁哈希表，释放所有内存
+/* ht_destroy — 销毁哈希表，释放所有内存
  * 遍历每个桶的链表，逐节点释放 word 字符串和节点本身
+ * 从“外”到“内”开辟内存，从“内”到“外”释放内存：先释放节点和字符串，再释放桶数组，最后释放哈希表结构体
  */
 void ht_destroy(HashTable *ht) {
     for (int i = 0; i < HASH_SIZE; i++) {
         WordEntry *entry = ht->buckets[i];
         while (entry) {
             WordEntry *next = entry->next;
-            free(entry->word);               /* 先释放字符串 */
-            free(entry);                     /* 再释放节点 */
+            free(entry->word);               /* 先释放字符串 对应 malloc(len + 1) */
+            free(entry);                     /* 再释放节点 对应 malloc(sizeof(WordEntry)) */
             entry = next;
         }
     }
-    free(ht->buckets);                       /* 释放桶数组 */
-    free(ht);                                /* 释放哈希表本身 */
+    free(ht->buckets);                       /* 释放桶数组 对应 calloc(HASH_SIZE, sizeof(WordEntry *)) */
+    free(ht);                                /* 释放哈希表本身 对应 malloc(sizeof(HashTable)) */
 }
