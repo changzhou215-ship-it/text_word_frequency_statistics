@@ -4,21 +4,13 @@
         {
             "label": "gcc build active file",
             "type": "shell",
-            "command": "D:\\Dev-Cpp\\MinGW64\\bin\\gcc.exe",
-            "args": [
-                "-std=c11",
-                "-g",
-                "${fileDirname}\\main.c",
-                "${fileDirname}\\hash_table.c",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
-            ],
+            "command": "${fileDirname}\\build.bat",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": ["$gcc"],
-            "detail": "Compile all .c files in the active file's directory"
+            "detail": "Run build.bat in the active file's directory"
         }
     ]
 }

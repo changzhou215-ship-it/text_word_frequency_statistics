@@ -79,9 +79,7 @@ int main(int argc, char *argv[]) {  // argc ：代表命令行参数的数量  a
     // sorted：待排序数组的首地址, unique_count：数组元素的数量
     // sizeof(WordPair)：每个元素的大小（占多少字节）, cmp_by_freq ：比较函数，定义了排序的规则（按频率从高到低）
 
-    /* 5. 输出
-     * 用到：<stdio.h> printf
-     */
+    /* 5. 输出*/
     int top_n = unique_count;  // 这里我们输出所有不重复的单词，如果只想输出前 N 个，可以把 top_n 设置为一个固定值，比如 10，也可以用三目运算符
     printf("All %d unique words (sorted by frequency):\n", top_n);
     for (int i = 0; i < top_n; i++)
