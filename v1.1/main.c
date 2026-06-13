@@ -93,7 +93,7 @@ static void output_results(WordPair *sorted, int unique_count,
 
     char line[MAX_LINE_LEN]; //定义一个字符数组作为输出行的缓冲区，用于存储每行输出的格式化字符串，包含单词、柱状图和计数信息，最大长度由 MAX_LINE_LEN 定义，以确保足够容纳最长的输出行
 
-    /* --- 分隔线和统计摘要 --- */
+    /* 分隔线和统计摘要 */
     fprintf(stdout, "\n"); //输出一个空行作为分隔符，增强输出的可读性,stdout 是标准输出流，通常指向屏幕
     if (out_fp) fprintf(out_fp, "\n"); //如果输出文件已成功打开，则也输出一个空行到文件中，保持屏幕和文件输出的一致性
 
@@ -121,7 +121,7 @@ static void output_results(WordPair *sorted, int unique_count,
     fprintf(stdout, "\n");
     if (out_fp) fprintf(out_fp, "\n"); //输出一个换行符，结束分隔线的输出，准备开始输出单词统计结果 
 
-    /* --- 逐词输出柱状图 --- */
+    /* 逐词输出柱状图 */
     for (int i = 0; i < display_count; i++) { //循环遍历要显示的单词数量，输出每个单词的统计信息和对应的柱状图
         draw_bar(sorted[i].word, sorted[i].count, max_count,
                  total_words, cfg->show_percentage, line, sizeof(line)); //调用 draw_bar 函数生成每个单词的输出行，传入单词字符串、单词计数、最高频率计数、总单词数、是否显示百分比的标志以及用于存储输出行的缓冲区和缓冲区大小，draw_bar 函数会将格式化后的输出行写入 line 缓冲区中
@@ -254,10 +254,6 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
     qsort(sorted, unique_count, sizeof(WordPair), cmp_by_freq); //调用 qsort 函数对 WordPair 数组进行排序，按照频率计数进行降序排序，传入数组指针、元素数量、每个元素的大小以及比较函数 cmp_by_freq 的指针
 
     if (argc == 1) { //如果没有提供命令行参数，表示程序处于交互式模式
-        /*printf("\n");
-        printf("File processed: %d total words, %d unique words.\n",
-               total_words, unique_count); */
-
         /* 4. Top N — 告知实际上限 */
         char top_buf[16]; // 定义一个字符数组作为输入缓冲区，用于存储用户输入的要显示的前 N 个单词的数量，最大长度为16字符
         printf("Show top N words (0 or Enter = all, max %d): ", unique_count);
@@ -284,7 +280,7 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
 
     /* 清理 */
     free(sorted); //释放之前通过 ht_to_array 函数分配的 WordPair 数组的内存，确保在程序退出前进行适当的清理
-    ht_destroy(ht); //调用 ht_destroy 函数来销毁哈希表实例，释放相关资源，确保在程序退出前进行适当的清理
+    ht_destroy(ht); //调用 ht_destroy 函数来销毁哈希表实例，释放相关资源
 
     return 0;
 }
