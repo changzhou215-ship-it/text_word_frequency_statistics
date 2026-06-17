@@ -85,6 +85,12 @@ void count_chars(const char *file_path, int *chars_with_spaces,
  */
 int cmp_by_alpha(const void *a, const void *b);
 
+/* has_non_ascii — 检查单词是否包含非 ASCII 字节（>= 0x80）
+ * 英文词频统计中，含 em dash、弯引号等 UTF-8 多字节字符的
+ * 单词应丢弃，避免 printf 按字节对齐时错位
+ */
+int has_non_ascii(const char *word);
+
 /* output_html — 生成 HTML 格式报告
  * 参数 sorted：排序后的 WordPair 数组
  * 参数 unique_count：不重复单词数

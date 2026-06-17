@@ -343,3 +343,17 @@
      ⑤ Makefile.win 缓存旧配置
         原因：Dev-Cpp 生成的 Makefile 不会随 .dev 修改自动刷新
         解决：每次修改 .dev 后，关闭 Dev-Cpp，删除 Makefile.win，重开项目
+
+  9. UTF-8 多字节字符导致柱状图错位
+
+     现象：advantage—catching、ai—may 等含 —（em dash）的词
+     在柱状图中偏离对齐线
+
+     原因：—（U+2014，3 字节 UTF-8）等非 ASCII 字符让 strlen()
+     按字节计数，printf("%-20s") 按字节对齐，多出的字节把整列顶歪
+
+     解决：新增 has_non_ascii() 函数，扫描到任何 >= 0x80 的字节
+     即丢弃该单词。英文词频统计不需要 UTF-8 多字节字符
+
+     注：ai-enabled 中的 - 是 ASCII 连字符（0x2D，1 字节），
+     不受影响。肉眼难辨但字节层面完全不同

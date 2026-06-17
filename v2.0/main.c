@@ -54,7 +54,10 @@ static int process_file(const char *file_path, CliConfig *cfg,
         char *cleaned = clean_word(buffer); //调用 clean_word 函数对转换为小写的单词进行清洗，去除首尾的标点符号，返回一个指向清洗后单词的指针，如果清洗后单词为空返回 NULL
         if (!cleaned) continue;    /* 全标点，跳过 */
 
-        /* Step 2.5: v2.0 过滤数字 */
+        /* Step 2.5: 过滤含非 ASCII 字节的词（em dash、弯引号等 UTF-8 字符，会使 printf 对齐错位） */
+        if (has_non_ascii(cleaned)) continue;
+
+        /* Step 2.6: v2.0 过滤数字 */
         if (is_numeric_word(cleaned)) continue;
 
         /* Step 3: 排除词检查 */
@@ -178,6 +181,8 @@ static void output_results(WordPair *sorted, int unique_count, int total_words, 
  * v2.0 扩展 11步交互、-c/-s/--sort/--html/-o、字符统计/TTR、数字过滤
  */
 int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量和参数值的字符串数组，函数根据传入的参数决定是进入命令行模式还是交互式模式
+    system("chcp 65001 > nul");  /* 控制台切 UTF-8 编码，printf 中文正常显示 */
+
     CliConfig cfg; //定义一个 CliConfig 结构体变量，用于存储命令行参数或交互式输入的配置选项，包括文件路径、排除词列表、显示选项等
     char interactive_path[512]; //定义一个字符数组作为交互式输入的文件路径缓冲区，最大长度为512字符
 
@@ -193,7 +198,7 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
     if (argc == 1) { //如果命令行参数数量为1，表示用户没有提供任何参数，程序将进入交互式模式
 
         /* 1. 输入文件 */
-        printf("Enter input file path: ");
+        printf("输入目标文件路径: ");
         if (!fgets(interactive_path, sizeof(interactive_path), stdin)) { //使用 fgets 函数从标准输入流读取用户输入的文件路径
             fprintf(stderr, "Error: No input.\n");
             return 1;
@@ -205,7 +210,7 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
         }
 
         /* 2. 排除词（先问，因为影响后续处理） */
-        printf("Words to exclude (space-separated, Enter for none): "); //提示用户输入要排除的单词列表，单词之间用空格分隔
+        printf("要排除的单词 (空格分隔，直接回车表示无): "); //提示用户输入要排除的单词列表，单词之间用空格分隔
         {
             char buf[512]; //定义一个字符数组作为输入缓冲区
             if (fgets(buf, sizeof(buf), stdin)) { //使用 fgets 函数读取用户输入的排除词列表
@@ -241,28 +246,28 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
 
         /* 3. v2.0 大小写敏感 */
         char cs_buf[8]; //定义一个字符数组作为输入缓冲区，用于存储用户输入的大小写敏感选项，最大长度为8字符，足以容纳 "y"、"n" 或者其他类似的输入
-        printf("Case-sensitive? (y/N): ");
+        printf("是否开启大小写敏感（y/N，默认 N）: "); //提示用户输入是否启用大小写敏感选项，默认情况下不启用
         if (fgets(cs_buf, sizeof(cs_buf), stdin)) //使用 fgets 函数读取用户输入的大小写敏感选项，如果用户输入以 'y' 或 'Y' 开头，则将配置结构体中的 case_sensitive 设置为1，表示启用大小写敏感
             cfg.case_sensitive = (cs_buf[0] == 'y' || cs_buf[0] == 'Y');
 
         /* 4. v2.0 停用词 */
         char sw_buf[8];
-        printf("Enable stopwords filter? (y/N): ");
+        printf("是否启用停用词过滤？（y/N）: ");
         if (fgets(sw_buf, sizeof(sw_buf), stdin))
             cfg.use_stopwords = (sw_buf[0] == 'y' || sw_buf[0] == 'Y');
 
         /* 5. v2.0 输出格式 */
         char fmt_buf[8];
-        printf("Output format: T(ext) / H(TML), default T: ");
+        printf("输出格式: T(ext) / H(TML), 默认 T: ");
         if (fgets(fmt_buf, sizeof(fmt_buf), stdin))
             cfg.html_output = (fmt_buf[0] == 'H' || fmt_buf[0] == 'h');
 
         /* 6. 输出文件 */
-        printf("Enter output file name");
+        printf("输入输出文件名: ");
         if (cfg.html_output) {
-            printf(" (default: wordfreq_report.html): ");
+            printf(" (默认: wordfreq_report.html): ");
         } else {
-            printf(" (default: wordfreq_result.txt): ");
+            printf(" (默认: wordfreq_result.txt): ");
         }
         if (!fgets(cfg.output_path, sizeof(cfg.output_path), stdin)) //使用 fgets 函数读取用户输入的输出文件路径
             strcpy(cfg.output_path, cfg.html_output ? "wordfreq_report.html" : "wordfreq_result.txt");
@@ -316,7 +321,7 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
     if (argc == 1) { //如果没有提供命令行参数，表示程序处于交互式模式
         /* 7. Top N — 告知实际上限 */
         char top_buf[16]; //定义一个字符数组作为输入缓冲区，用于存储用户输入的要显示的前 N 个单词的数量，最大长度为16字符
-        printf("Show top N words (0 or Enter = all, max %d): ", unique_count);
+        printf("显示前 N 个单词 (0 或回车 = 全部, 最大 %d): ", unique_count);
         if (fgets(top_buf, sizeof(top_buf), stdin) //从标准输入流读取用户输入的要显示的前 N 个单词的数量
             && top_buf[0] != '\r' && top_buf[0] != '\n') { //如果读取成功并且用户输入的不是空行（即 Enter）
             cfg.top_n = atoi(top_buf); //调用C标准库的 atoi 函数将输入的字符串转换为整数，存储在配置结构体的 top_n 字段中，atoi 函数会解析字符串中的数字并返回对应的整数值
@@ -325,13 +330,13 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
 
         /* 8. v2.0 排序方式 */
         char sort_buf[8]; //定义一个字符数组作为输入缓冲区，用于存储用户输入的排序方式选项，最大长度为8字符
-        printf("Sort by: F(req) / A(lpha), default F: ");
+        printf("排序方式: F(req) / A(lpha), 默认 F: ");
         if (fgets(sort_buf, sizeof(sort_buf), stdin))
             cfg.sort_mode = (sort_buf[0] == 'A' || sort_buf[0] == 'a') ? 1 : 0;
 
         /* 9. 百分比（默认 y） */
         char pct_buf[8]; //定义一个字符数组作为输入缓冲区，用于存储输入的是否显示百分比的选项，最大长度为8字符
-        printf("Show percentage? (Y/n, default Y): ");
+        printf("显示百分比吗? (Y/n, 默认 Y): ");
         if (fgets(pct_buf, sizeof(pct_buf), stdin))
             cfg.show_percentage = (pct_buf[0] != 'n' && pct_buf[0] != 'N'); //从标准输入流读取用户输入的是否显示百分比的选项，如果输入 'n'/'N' 则不显示，否则显示
                                                                             //如果读取成功则检查用户输入的第一个字符，如果是 'n' 或 'N' 则将 show_percentage 设置为0，否则设置为1，默认情况下交互式模式会显示百分比

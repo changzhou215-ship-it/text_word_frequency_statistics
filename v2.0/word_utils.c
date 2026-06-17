@@ -50,6 +50,14 @@ char *clean_word(char *word) { // 定义一个函数来清洗单词，接受一�
     return start;
 }
 
+/* 检查单词是否包含非 ASCII 字节（>= 0x80），含 em dash、弯引号等即丢弃 */
+int has_non_ascii(const char *word) {
+    if (!word) return 0;
+    for (const char *p = word; *p; p++)
+        if ((unsigned char)*p >= 0x80) return 1;
+    return 0;
+}
+
 
 int word_matches_length(const char *word, int min_len, int max_len) { //定义一个函数来检查单词的长度是否在指定的最小和最大范围内，接受一个字符串指针和两个整数参数，分别表示最小长度和最大长度
     if (!word) return 0; /* 如果传入的字符串指针为 NULL，则返回 0，表示不匹配 */
