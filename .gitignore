@@ -1,3 +1,9 @@
 v1.0.dev
 v1.1.dev
 v2.0.dev
+v1.1/cli_parser.o
+v1.1/hash_table.o
+v1.0/main.o
+v1.0/hash_table.o
+v1.1/main.o
+v1.1/word_utils.o

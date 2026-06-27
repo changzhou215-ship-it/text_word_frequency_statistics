@@ -95,5 +95,10 @@ int main(int argc, char *argv[]) {  // argc ：代表命令行参数的数量  a
      */
     free(sorted);
     ht_destroy(ht);
+
+    /* 防止窗口闪退（验收后可删除） */
+    fflush(stdin);
+    printf("\n=== Press Enter to exit... ===");
+    getchar();
     return 0;
 }

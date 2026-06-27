@@ -1,7 +1,7 @@
 /* cli_parser.h — 命令行参数解析声明
  * 功能：解析单词频率统计工具的命令行参数，将 argc/argv 转换为结构化的配置
  * v1.1 新增模块
- * [v2.0 扩展] 新增 -c -s --sort --html 四个 flag
+ * v2.0 扩展 新增 -c -s --sort --html 四个 flag
 */
 
 #ifndef CLI_PARSER_H
@@ -24,7 +24,7 @@ typedef struct {
     int  show_percentage;               /* 是否显示百分比 (-p)，1=显示, 0=不显示 */
     int  has_error;                     /* 解析过程中是否有错误 ，1=有错误, 0=无错误 */
 
-    /* === [v2.0 新增] === */
+    /* v2.0 新增 */
     int  case_sensitive;                /* 大小写敏感 (-c)，0=不敏感(默认), 1=敏感 */
     int  use_stopwords;                 /* 启用停用词过滤 (-s)，0=关闭(默认), 1=启用 */
     int  sort_mode;                     /* 排序方式 (--sort)，0=freq降序(默认), 1=alpha */
@@ -42,10 +42,10 @@ typedef struct {
  *   --max-length <N>    最大单词长度
  *   -p                  显示百分比
  *   -o <file>           输出文件路径
- *   [v2.0] -c           大小写敏感
- *   [v2.0] -s           启用停用词过滤
- *   [v2.0] --sort <freq|alpha>  排序方式
- *   [v2.0] --html       HTML 格式输出
+ *   v2.0 -c           大小写敏感
+ *   v2.0 -s           启用停用词过滤
+ *   v2.0 --sort <freq|alpha>  排序方式
+ *   v2.0 --html       HTML 格式输出
  */
 CliConfig parse_cli(int argc, char *argv[]);
 

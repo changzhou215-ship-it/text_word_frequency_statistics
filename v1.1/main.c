@@ -282,5 +282,9 @@ int main(int argc, char *argv[]) { //主函数，传入命令行参数的数量�
     free(sorted); //释放之前通过 ht_to_array 函数分配的 WordPair 数组的内存，确保在程序退出前进行适当的清理
     ht_destroy(ht); //调用 ht_destroy 函数来销毁哈希表实例，释放相关资源
 
+    /* 防止窗口闪退（验收后可删除） */
+    fflush(stdin);
+    printf("\n=== Press Enter to exit... ===");
+    getchar();
     return 0;
 }

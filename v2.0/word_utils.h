@@ -1,27 +1,26 @@
 /* word_utils.h — 单词处理工具声明
  * 功能：单词清洗、长度过滤、百分比计算、柱状图生成
- * [v2.0 扩展] 新增字符统计、TTR、停用词、alpha排序、HTML输出
- * 纯 C11 标准，无第三方依赖
  * v1.1 新增模块
+ * v2.0 扩展 新增停用词、TTR、字符统计、alpha排序、HTML输出
 */
 
 #ifndef WORD_UTILS_H
 #define WORD_UTILS_H
 
-#include "hash_table.h"  /* [v2.0] 引入 WordPair 类型 */
+#include "hash_table.h"  /* v2.0 引入 WordPair 类型 */
 
 /* 柱状图最大宽度（字符数） */
-#define BAR_MAX_WIDTH 40  /* [v2.0] 调窄避免终端换行 */
+#define BAR_MAX_WIDTH 40  /* v2.0 调窄避免终端换行 */
 
-/* [v2.0] 停用词数量 */
+/* v2.0 停用词数量 */
 #define STOPWORDS_COUNT 200
 
 /* clean_word — 清洗单词的首尾标点符号
  * 功能：去除单词开头和结尾的标点（.,!?;:'\"()-[]{}等），
- *       保留单词中间的连字符和撇号（如 don't, state-of-the-art）
- *       清洗后若单词为空（如纯符号"!!!"），返回 NULL
+ * 保留单词中间的连字符和撇号（如 don't, state-of-the-art）
+ * 清洗后若单词为空（如纯符号"!!!"），返回 NULL
  * 参数 word：原始单词字符串（原地修改，调用者负责缓冲区）
- * 返回    ：清洗后单词的首地址，若结果为空串则返回 NULL
+ * 返回：清洗后单词的首地址，若结果为空串则返回 NULL
  */
 char *clean_word(char *word);
 
@@ -29,20 +28,20 @@ char *clean_word(char *word);
  * 参数 word：单词字符串
  * 参数 min_len：最小长度（包含），0 表示不限制
  * 参数 max_len：最大长度（包含），-1 表示不限制
- * 返回    ：1 匹配，0 不匹配
+ * 返回：1 匹配，0 不匹配
  */
 int word_matches_length(const char *word, int min_len, int max_len);
 
 /* calc_percentage — 计算百分比
  * 参数 count：单词出现次数
  * 参数 total：总单词数
- * 返回    ：百分比（浮点数，如 25.50 表示 25.50%）
+ * 返回：百分比（浮点数，如 25.50 表示 25.50%）
  */
 double calc_percentage(int count, int total);
 
 /* draw_bar — 绘制水平 ASCII 柱状图行
  * 功能：根据比例生成一条格式化的柱状图行
- *       格式："word  ########  12  (24.5%)"
+ * 格式："word  ########  12  (24.5%)"
  * 参数 word      ：单词字符串
  * 参数 count     ：出现次数
  * 参数 max_count ：最高频率（用于缩放）
@@ -54,21 +53,21 @@ double calc_percentage(int count, int total);
 void draw_bar(const char *word, int count, int max_count, int total,
               int show_pct, char *buf, int buf_size);
 
-/* === [v2.0 新增] === */
+/* v2.0 新增 */
 
 /* is_stopword — 检查单词是否为停用词
  * 参数 word：要检查的单词
- * 返回    ：1 是停用词，0 不是
-/* [v2.0] is_stopword — 检查单词是否为停用词 */
+ * 返回：1 是停用词，0 不是
+/* v2.0 is_stopword — 检查单词是否为停用词 */
 int is_stopword(const char *word);
 
-/* [v2.0] is_numeric_word — 检查单词是否为数字 */
+/* v2.0 is_numeric_word — 检查单词是否为数字 */
 int is_numeric_word(const char *word);
 
 /* calc_ttr — 计算词汇多样性 (Type-Token Ratio)
  * 参数 unique：不重复单词数
  * 参数 total ：总单词数
- * 返回    ：TTR 百分比
+ * 返回：TTR 百分比
  */
 double calc_ttr(int unique, int total);
 
